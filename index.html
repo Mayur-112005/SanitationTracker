@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SanitTrack · SDG 6</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #eef7f2;
+      --white:   #ffffff;
+      --border:  #c8e6d4;
+      --green:   #0a6e3f;
+      --blue:    #0369a1;
+      --text:    #0c2718;
+      --muted:   #557a65;
+      --success: #16a34a;
+      --warn:    #d97706;
+      --danger:  #dc2626;
+      --font:    'Plus Jakarta Sans', sans-serif;
+      --mono:    'JetBrains Mono', monospace;
+      --r:       12px;
+      --sh:      0 2px 12px rgba(10,110,63,0.08);
+      --sh2:     0 6px 32px rgba(10,110,63,0.14);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── stripe ── */
+    .stripe{height:4px;background:linear-gradient(90deg,#0a6e3f,#0369a1,#d97706,#0a6e3f);background-size:200%;animation:sh 4s linear infinite;}
+    @keyframes sh{to{background-position:200% 0;}}
+
+    /* ── header ── */
+    header{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--sh);}
+    .logo{display:flex;align-items:center;gap:11px;}
+    .logo-i{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#0a6e3f,#0369a1);display:flex;align-items:center;justify-content:center;font-size:17px;}
+    .logo h1{font-size:1rem;font-weight:800;color:var(--green);letter-spacing:-.02em;}
+    .logo p{font-size:.59rem;color:var(--muted);font-family:var(--mono);}
+    .hdr-r{display:flex;align-items:center;gap:10px;}
+    #waddr{font-family:var(--mono);font-size:.66rem;color:var(--blue);background:#eff6ff;padding:4px 11px;border-radius:999px;border:1px solid #bfdbfe;display:none;}
+    #cbtn{background:var(--green);color:#fff;border:none;padding:8px 17px;border-radius:8px;font-family:var(--font);font-weight:700;font-size:.79rem;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(10,110,63,.24);}
+    #cbtn:hover{background:#0b8a4e;transform:translateY(-1px);}
+    #cbtn.ok{background:#16a34a;}
+
+    /* ── hero ── */
+    .hero{background:linear-gradient(135deg,#0a6e3f,#0369a1);padding:44px 32px 36px;text-align:center;color:#fff;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='20' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E");}
+    .hero-badge{display:inline-block;font-family:var(--mono);font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;background:rgba(255,255,255,.14);color:#fff;padding:4px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.28);margin-bottom:14px;position:relative;}
+    .hero h2{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:9px;position:relative;}
+    .hero p{font-size:.9rem;opacity:.8;max-width:460px;margin:0 auto;position:relative;}
+
+    /* ── stats strip ── */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--sh);}
+    .sb{padding:15px 18px;text-align:center;border-right:1px solid var(--border);position:relative;transition:background .2s;cursor:default;}
+    .sb:last-child{border-right:none;}
+    .sb:hover{background:#f0fdf4;}
+    .sb::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:var(--green);transition:width .3s;border-radius:999px;}
+    .sb:hover::after{width:46%;}
+    .sv{font-size:1.55rem;font-weight:800;color:var(--green);line-height:1;}
+    .sl{font-size:.63rem;color:var(--muted);font-family:var(--mono);margin-top:3px;text-transform:uppercase;letter-spacing:.07em;}
+
+    /* ── wrap ── */
+    .wrap{max-width:1160px;margin:0 auto;padding:26px 22px;}
+
+    /* ── section title ── */
+    .stitle{font-size:.72rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* ── grid ── */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+    @media(max-width:780px){.grid2{grid-template-columns:1fr;}}
+
+    /* ── card ── */
+    .card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);transition:box-shadow .2s,border-color .2s;}
+    .card:hover{box-shadow:var(--sh2);border-color:#99d4b4;}
+    .chdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--border);}
+    .cico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+    .cg{background:#d1fae5;} .cb{background:#dbeafe;} .co{background:#fef3c7;} .cp{background:#ede9fe;} .ct{background:#ccfbf1;}
+    .ctitle{font-size:.84rem;font-weight:700;}
+    .csub{font-size:.62rem;color:var(--muted);font-family:var(--mono);margin-top:1px;}
+
+    /* ── form ── */
+    label{display:block;font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em;}
+    input,textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:.84rem;padding:8px 12px;margin-bottom:12px;transition:border-color .2s,box-shadow .2s;outline:none;}
+    input:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(10,110,63,.1);}
+    textarea{resize:vertical;min-height:68px;}
+    .divider{height:1px;background:var(--border);margin:13px 0;}
+    .slbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:6px;}
+
+    /* ── buttons ── */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 17px;border-radius:8px;border:none;font-family:var(--font);font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;width:100%;}
+    .bg{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(10,110,63,.22);}
+    .bg:hover{background:#0b8a4e;transform:translateY(-1px);}
+    .bb{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(3,105,161,.18);}
+    .bb:hover{background:#0284c7;transform:translateY(-1px);}
+    .bo{background:var(--white);color:var(--green);border:1.5px solid var(--green);}
+    .bo:hover{background:#f0fdf4;}
+    .bsm{padding:6px 13px;font-size:.74rem;width:auto;}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
+
+    /* ── range ── */
+    .rbig{text-align:center;font-family:var(--mono);font-size:1.7rem;font-weight:700;color:var(--green);margin-bottom:5px;}
+    input[type=range]{padding:0;height:6px;accent-color:var(--green);margin-bottom:13px;}
+
+    /* ── contrib result ── */
+    .cres{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.78rem;color:var(--blue);margin-top:7px;display:none;}
+
+    /* ── status result ── */
+    .sres{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px;margin-top:11px;display:none;}
+    .sres-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+    .sres-title{font-weight:700;font-size:.9rem;}
+    .sres-loc{font-size:.72rem;color:var(--muted);margin-bottom:7px;}
+    .sres-desc{font-size:.79rem;margin-bottom:9px;line-height:1.5;}
+    .sres-note{background:#f0fdf4;border-left:3px solid var(--green);padding:6px 10px;border-radius:0 6px 6px 0;font-size:.73rem;margin-bottom:9px;}
+    .smeta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px;}
+    .smi{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 10px;}
+    .smil{font-size:.59rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;}
+    .smiv{font-family:var(--mono);font-size:.78rem;font-weight:600;}
+
+    /* ── progress bar ── */
+    .pb{height:6px;background:var(--border);border-radius:999px;overflow:hidden;margin:6px 0;}
+    .pf{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .6s;}
+    .pl{display:flex;justify-content:space-between;font-size:.67rem;color:var(--muted);font-family:var(--mono);}
+
+    /* ── badges ── */
+    .badge{font-size:.61rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:999px;font-weight:600;}
+    .bProposed{background:#fef9c3;color:#92400e;border:1px solid #fde68a;}
+    .bActive{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+    .bCompleted{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;}
+    .bCancelled{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+
+    /* ── dashboard summary cards ── */
+    .dsum{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+    .dsc{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+    .dsc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .dg::before{background:var(--green);}
+    .db::before{background:var(--blue);}
+    .dw::before{background:var(--warn);}
+    .ds::before{background:#64748b;}
+    .dico{font-size:1.2rem;margin-bottom:7px;}
+    .dval{font-size:1.6rem;font-weight:800;color:var(--text);line-height:1;}
+    .dlbl{font-size:.62rem;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;}
+
+    /* ── project cards ── */
+    .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:26px;}
+    .pc{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:15px;transition:all .2s;}
+    .pc:hover{border-color:#6ee7b7;box-shadow:0 4px 18px rgba(10,110,63,.1);transform:translateY(-2px);}
+    .pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+    .pc-num{font-family:var(--mono);font-size:.59rem;color:var(--muted);margin-bottom:2px;}
+    .pc-name{font-weight:700;font-size:.88rem;}
+    .pc-loc{font-size:.67rem;color:var(--muted);margin-top:2px;}
+    .pc-funds{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
+    .fb{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 9px;text-align:center;}
+    .fl{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+    .fv{font-family:var(--mono);font-size:.78rem;font-weight:600;margin-top:2px;}
+    .fv.g{color:var(--success);}
+
+    /* ── table ── */
+    .tcard{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh);}
+    .thead{background:var(--green);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;}
+    .thead-t{font-size:.82rem;font-weight:700;color:#fff;}
+    .thead-s{font-size:.6rem;color:rgba(255,255,255,.5);font-family:var(--mono);margin-top:1px;}
+    .twrap{overflow-x:auto;}
+    .dt{width:100%;border-collapse:collapse;font-size:.77rem;}
+    .dt th{background:#f8fafc;color:var(--muted);padding:9px 13px;text-align:left;font-weight:700;font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+    .dt td{padding:10px 13px;border-bottom:1px solid #f0f7f4;vertical-align:middle;}
+    .dt tr:last-child td{border-bottom:none;}
+    .dt tr:hover td{background:#f9fffe;}
+    .tn{color:var(--muted);font-family:var(--mono);font-size:.67rem;}
+    .ti{color:var(--blue);font-family:var(--mono);font-weight:600;font-size:.73rem;}
+    .te{color:var(--success);font-family:var(--mono);font-weight:600;}
+    .tp{color:var(--warn);font-family:var(--mono);font-weight:600;}
+
+    /* ── empty / loading ── */
+    .empty{text-align:center;padding:44px 20px;color:var(--muted);}
+    .ei{font-size:2.2rem;margin-bottom:9px;}
+    .empty p{font-size:.83rem;}
+    .loading-row td{text-align:center;color:var(--muted);padding:28px;font-family:var(--mono);font-size:.78rem;}
+
+    /* ── notification ── */
+    #notif{position:fixed;top:76px;right:20px;z-index:9999;background:var(--white);border-radius:12px;padding:12px 16px;font-size:.81rem;font-weight:600;max-width:300px;box-shadow:0 8px 28px rgba(0,0,0,.13);transform:translateX(130%);transition:transform .3s ease;border-left:4px solid var(--green);}
+    #notif.show{transform:translateX(0);}
+    #notif.err{border-left-color:var(--danger);color:var(--danger);}
+    #notif.ok2{border-left-color:var(--success);color:var(--success);}
+    #notif.inf{border-left-color:var(--blue);color:var(--blue);}
+
+    /* ── spinner ── */
+    .sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    footer{text-align:center;padding:20px;border-top:1px solid var(--border);background:var(--white);font-size:.66rem;color:var(--muted);font-family:var(--mono);margin-top:18px;}
+    footer strong{color:var(--green);}
+
+    @media(max-width:600px){
+      .stats,.dsum{grid-template-columns:1fr 1fr;}
+      header{padding:0 14px;}
+    }
+  </style>
+</head>
+<body>
+<div class="stripe"></div>
+<div id="notif"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-i">💧</div>
+    <div>
+      <h1>SanitTrack</h1>
+      <p>SDG 6 · Mini Project 36 · BE IT 2026</p>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <span id="waddr"></span>
+    <button id="cbtn" onclick="connectWallet()">🔗 Connect MetaMask</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🌍 UN Sustainable Development Goal 6</div>
+  <h2>Sanitation Project Tracker</h2>
+  <p>Transparent on-chain funding & tracking of clean water and sanitation projects — powered by Ethereum blockchain.</p>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats">
+  <div class="sb"><div class="sv" id="st">—</div><div class="sl">Total Projects</div></div>
+  <div class="sb"><div class="sv" id="sa">—</div><div class="sl">Active</div></div>
+  <div class="sb"><div class="sv" id="sc">—</div><div class="sl">Completed</div></div>
+  <div class="sb"><div class="sv" id="se">—</div><div class="sl">ETH Raised</div></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ── FUNCTIONS ── -->
+  <div class="stitle">Smart Contract Functions</div>
+  <div class="grid2">
+
+    <!-- 1. createProject -->
+    <div class="card">
+      <div class="chdr">
+        <div class="cico cg">🏗️</div>
+        <div><div class="ctitle">Create Project</div><div class="csub">createProject(name, location, description, fundingGoal)</div></div>
+      </div>
+      <label>Project Name</label>
+      <input id="cp-name" placeholder="e.g. Rural Toilet Block Construction"/>
+      <label>Location</label>
+      <input id="cp-loc" placeholder="e.g. Vasai, Maharashtra"/>
+      <label>Description</label>
+      <textarea id="cp-desc" placeholder="Describe the sanitation project..."></textarea>
+      <label>Funding Goal (ETH)</label>
+      <input id="cp-goal" type="number" step="0.001" min="0.001" placeholder="0.001"/>
+      <button class="btn bg" id="btn-create" onclick="doCreate()">+ Create Project</button>
+    </div>
+
+    <!-- 2. fundProject -->
+    <div class="card">
+      <div class="chdr">
+        <div class="cico cb">💰</div>
+        <div><div class="ctitle">Fund a Project</div><div class="csub">fundProject(projectId) — payable</div></div>
+      </div>
+      <label>Project ID</label>
+      <input id="fp-id" type="number" min="1" placeholder="Enter Project ID (e.g. 1)"/>
+      <label>Amount (ETH)</label>
+      <input id="fp-amt" type="number" step="0.001" min="0.001" placeholder="0.001"/>
+      <button class="btn bb" id="btn-fund" onclick="doFund()">💰 Fund Project</button>
+      <div class="divider"></div>
+      <div class="slbl">getMyContribution(projectId)</div>
+      <input id="mc-id" type="number" min="1" placeholder="Project ID"/>
+      <button class="btn bo" onclick="doContrib()">Check My Contribution</button>
+      <div class="cres" id="mc-res"></div>
+    </div>
+
+    <!-- 3. updateProgress -->
+    <div class="card">
+      <div class="chdr">
+        <div class="cico co">📊</div>
+        <div><div class="ctitle">Update Progress</div><div class="csub">updateProgress(projectId, percent, note) — creator only</div></div>
+      </div>
+      <label>Project ID</label>
+      <input id="up-id" type="number" min="1" placeholder="Enter Project ID (e.g. 1)"/>
+      <label>Progress %</label>
+      <div class="rbig" id="rbig">50%</div>
+      <input type="range" id="up-pct" min="0" max="100" value="50"
+        oninput="document.getElementById('rbig').textContent=this.value+'%'"/>
+      <label>Progress Note</label>
+      <textarea id="up-note" placeholder="e.g. Foundation work completed..."></textarea>
+      <button class="btn bg" id="btn-update" onclick="doUpdate()">📊 Update Progress</button>
+    </div>
+
+    <!-- 4. getStatus -->
+    <div class="card">
+      <div class="chdr">
+        <div class="cico cp">🔍</div>
+        <div><div class="ctitle">Get Project Status</div><div class="csub">getStatus(projectId) — view function</div></div>
+      </div>
+      <label>Project ID</label>
+      <input id="gs-id" type="number" min="1" placeholder="Enter Project ID (e.g. 1)"/>
+      <button class="btn bo" onclick="doStatus()">🔍 Get Status</button>
+      <div class="sres" id="sres"></div>
+    </div>
+
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="stitle" style="margin-top:8px">Dashboard</div>
+
+  <!-- Summary cards -->
+  <div class="dsum">
+    <div class="dsc dg"><div class="dico">🏗️</div><div class="dval" id="d-t">—</div><div class="dlbl">Total Projects</div></div>
+    <div class="dsc db"><div class="dico">⚡</div><div class="dval" id="d-a">—</div><div class="dlbl">Active</div></div>
+    <div class="dsc dw"><div class="dico">✅</div><div class="dval" id="d-c">—</div><div class="dlbl">Completed</div></div>
+    <div class="dsc ds"><div class="dico">💎</div><div class="dval" id="d-e">—</div><div class="dlbl">ETH Raised</div></div>
+  </div>
+
+  <!-- Project cards -->
+  <div class="stitle">All Projects</div>
+  <div class="pgrid" id="pgrid">
+    <div class="empty"><div class="ei">🌿</div><p>Connect wallet to load projects</p></div>
+  </div>
+
+  <!-- Table -->
+  <div class="stitle">Complete Project Records</div>
+  <div class="tcard">
+    <div class="thead">
+      <div>
+        <div class="thead-t">All Registered Sanitation Projects</div>
+        <div class="thead-s">Fetched from Sepolia blockchain via getAllProjects()</div>
+      </div>
+      <button class="btn bo bsm" onclick="loadDashboard()" style="width:auto;color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.1);">↻ Refresh</button>
+    </div>
+    <div class="twrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Sr.</th><th>Project ID</th><th>Project Name</th><th>Location</th>
+            <th>Funds Raised</th><th>Funding Goal</th><th>Progress</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="dtbody">
+          <tr class="loading-row"><td colspan="8">Connect wallet to load records</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  Built for <strong>SDG 6: Clean Water & Sanitation</strong> ·
+  Prajapati Mayur Suryanath · Roll 34 · BE IT 2026 ·
+  Deployed on <strong>Sepolia Testnet</strong>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  ⚠️  PASTE YOUR SEPOLIA CONTRACT ADDRESS HERE
+//  Get it from Remix after deploying with
+//  Injected Provider - MetaMask on Sepolia
+// ══════════════════════════════════════════════
+const ADDR = "0x965186861606d3cd0c53bC9169d36a6c2A55eba3";
+
+// ABI — exactly matches SanitationProjectTracker.sol
+const ABI = [
+  {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[{"name":"name","type":"string"},{"name":"location","type":"string"},{"name":"description","type":"string"},{"name":"fundingGoal","type":"uint256"}],"name":"createProject","outputs":[{"name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"name":"projectId","type":"uint256"}],"name":"fundProject","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[{"name":"projectId","type":"uint256"},{"name":"progressPercent","type":"uint256"},{"name":"note","type":"string"}],"name":"updateProgress","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"name":"projectId","type":"uint256"}],"name":"getStatus","outputs":[{"name":"id","type":"uint256"},{"name":"name","type":"string"},{"name":"location","type":"string"},{"name":"description","type":"string"},{"name":"creator","type":"address"},{"name":"fundingGoal","type":"uint256"},{"name":"fundsRaised","type":"uint256"},{"name":"progressPercent","type":"uint256"},{"name":"progressNote","type":"string"},{"name":"status","type":"string"},{"name":"createdAt","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"getAllProjects","outputs":[{"name":"ids","type":"uint256[]"},{"name":"names","type":"string[]"},{"name":"locations","type":"string[]"},{"name":"fundsRaised","type":"uint256[]"},{"name":"fundingGoals","type":"uint256[]"},{"name":"progresses","type":"uint256[]"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"name":"projectId","type":"uint256"}],"name":"getMyContribution","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"name":"projectId","type":"uint256"}],"name":"cancelProject","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"projectCount","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"stateMutability":"view","type":"function"}
+];
+
+let provider, signer, contract;
+
+// ── notify ──────────────────────────────────
+function notify(msg, t='ok2') {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.className = 'show '+t;
+  setTimeout(()=>el.className='', 4500);
+}
+
+// ── toEth ────────────────────────────────────
+function toEth(w) {
+  if (w===undefined||w===null) return '0.0000';
+  try{ return (Number(BigInt(w.toString()))/1e18).toFixed(4); }
+  catch{ return '0.0000'; }
+}
+
+// ── fundPct ──────────────────────────────────
+function fpct(goal, raised) {
+  try{
+    const g=Number(BigInt(goal.toString())), r=Number(BigInt(raised.toString()));
+    return g>0?Math.min((r/g)*100,100).toFixed(0):0;
+  }catch{return 0;}
+}
+
+// ── badge ────────────────────────────────────
+function badge(s){ return `<span class="badge b${s||'Proposed'}">${s||'Proposed'}</span>`; }
+
+// ── shortAddr ────────────────────────────────
+function sa(a){ return a?a.slice(0,8)+'…'+a.slice(-4):'—'; }
+
+// ── loadEthers ───────────────────────────────
+async function loadEthers() {
+  if (window.ethers) return window.ethers;
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js';
+    s.onload=res; s.onerror=rej; document.head.appendChild(s);
+  });
+  return window.ethers;
+}
+
+// ── CONNECT WALLET ───────────────────────────
+async function connectWallet() {
+  if (ADDR === "PASTE_YOUR_SEPOLIA_CONTRACT_ADDRESS_HERE") {
+    notify('⚠️ Please paste your Sepolia contract address in the HTML file first!', 'err');
+    return;
+  }
+  if (!window.ethereum) { notify('MetaMask not found! Please install it.','err'); return; }
+  try {
+    await window.ethereum.request({method:'eth_requestAccounts'});
+    const ethers = await loadEthers();
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer   = await provider.getSigner();
+    const addr = await signer.getAddress();
+    const net  = await provider.getNetwork();
+
+    if (net.chainId !== 11155111n) {
+      notify('Switch MetaMask to Sepolia Testnet!','err'); return;
+    }
+
+    document.getElementById('waddr').textContent = sa(addr);
+    document.getElementById('waddr').style.display = 'block';
+    const btn = document.getElementById('cbtn');
+    btn.textContent = '✅ Connected'; btn.classList.add('ok');
+
+    // Create contract
+    contract = new ethers.Contract(ADDR, ABI, signer);
+    notify('Connected! Loading all data...','inf');
+
+    // Load everything immediately
+    await loadDashboard();
+  } catch(e) { notify('Failed: '+(e.message||e),'err'); }
+}
+
+// ── LOAD DASHBOARD (main data function) ──────
+async function loadDashboard() {
+  if (!contract) {
+    notify('Connect your MetaMask wallet first!','err'); return;
+  }
+
+  // Show loading state in table
+  document.getElementById('dtbody').innerHTML = '<tr class="loading-row"><td colspan="8">⏳ Loading from Sepolia blockchain...</td></tr>';
+  document.getElementById('pgrid').innerHTML  = '<div class="empty"><div class="ei">⏳</div><p>Fetching from blockchain...</p></div>';
+
+  try {
+    // Call getAllProjects() — returns 6 parallel arrays
+    const r = await contract.getAllProjects();
+    const ids    = r[0];
+    const names  = r[1];
+    const locs   = r[2];
+    const raised = r[3];
+    const goals  = r[4];
+    const progs  = r[5];
+    const total  = ids.length;
+
+    // Get status for each project
+    const statuses = [];
+    for (let i=0; i<total; i++) {
+      try {
+        const s = await contract.getStatus(Number(ids[i]));
+        statuses.push(s[9]); // status string at index 9
+      } catch { statuses.push('Proposed'); }
+    }
+
+    // Calculate stats
+    const active   = statuses.filter(s=>s==='Active'||s==='Proposed').length;
+    const done     = statuses.filter(s=>s==='Completed').length;
+    const totalEth = raised.reduce((a,b)=>a+Number(BigInt(b.toString())),0)/1e18;
+
+    // Update stats strip
+    document.getElementById('st').textContent = total;
+    document.getElementById('sa').textContent = active;
+    document.getElementById('sc').textContent = done;
+    document.getElementById('se').textContent = totalEth.toFixed(3)+' ETH';
+
+    // Update dashboard summary
+    document.getElementById('d-t').textContent = total;
+    document.getElementById('d-a').textContent = active;
+    document.getElementById('d-c').textContent = done;
+    document.getElementById('d-e').textContent = totalEth.toFixed(3)+' ETH';
+
+    if (total === 0) {
+      document.getElementById('pgrid').innerHTML  = '<div class="empty"><div class="ei">🌿</div><p>No projects yet. Create the first one above!</p></div>';
+      document.getElementById('dtbody').innerHTML = '<tr class="loading-row"><td colspan="8">No projects found on this contract</td></tr>';
+      return;
+    }
+
+    // Project cards
+    document.getElementById('pgrid').innerHTML = ids.map((id,i)=>{
+      const pct = Number(progs[i]);
+      const fp  = fpct(goals[i], raised[i]);
+      return `<div class="pc">
+        <div class="pc-top">
+          <div>
+            <div class="pc-num">PROJECT #${id}</div>
+            <div class="pc-name">${names[i]}</div>
+            <div class="pc-loc">📍 ${locs[i]}</div>
+          </div>
+          ${badge(statuses[i])}
+        </div>
+        <div class="pb"><div class="pf" style="width:${pct}%"></div></div>
+        <div class="pl"><span>Progress: ${pct}%</span><span>Funded: ${fp}%</span></div>
+        <div class="pc-funds">
+          <div class="fb"><div class="fl">Raised</div><div class="fv g">${toEth(raised[i])} ETH</div></div>
+          <div class="fb"><div class="fl">Goal</div><div class="fv">${toEth(goals[i])} ETH</div></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Table rows
+    document.getElementById('dtbody').innerHTML = ids.map((id,i)=>`
+      <tr>
+        <td class="tn">${i+1}</td>
+        <td class="ti">P-${String(Number(id)).padStart(3,'0')}</td>
+        <td style="font-weight:600">${names[i]}</td>
+        <td>${locs[i]}</td>
+        <td class="te">${toEth(raised[i])} ETH</td>
+        <td>${toEth(goals[i])} ETH</td>
+        <td class="tp">${progs[i]}%</td>
+        <td>${badge(statuses[i])}</td>
+      </tr>`).join('');
+
+    notify('✅ Dashboard loaded — '+total+' project(s) found!','ok2');
+
+  } catch(e) {
+    console.error('loadDashboard error:', e);
+    document.getElementById('pgrid').innerHTML  = '<div class="empty"><div class="ei">❌</div><p>Error loading: '+e.message+'</p></div>';
+    document.getElementById('dtbody').innerHTML = '<tr class="loading-row"><td colspan="8">Error: '+e.message+'</td></tr>';
+    notify('Load error: '+e.message,'err');
+  }
+}
+
+// ── CREATE PROJECT ────────────────────────────
+async function doCreate() {
+  if (!contract) { notify('Connect wallet first!','err'); return; }
+  const name = document.getElementById('cp-name').value.trim();
+  const loc  = document.getElementById('cp-loc').value.trim();
+  const desc = document.getElementById('cp-desc').value.trim();
+  const goal = document.getElementById('cp-goal').value;
+  if (!name||!loc||!desc||!goal) { notify('Fill in all fields!','err'); return; }
+
+  const btn = document.getElementById('btn-create');
+  btn.disabled=true; btn.innerHTML='<span class="sp"></span> Creating...';
+  try {
+    const ethers = await loadEthers();
+    const tx = await contract.createProject(name, loc, desc, ethers.parseEther(goal));
+    notify('Transaction sent — confirming on Sepolia...','inf');
+    await tx.wait();
+    notify('✅ Project created!','ok2');
+    ['cp-name','cp-loc','cp-desc','cp-goal'].forEach(id=>document.getElementById(id).value='');
+    await loadDashboard();
+  } catch(e) { notify('Error: '+(e.reason||e.message),'err'); }
+  finally { btn.disabled=false; btn.innerHTML='+ Create Project'; }
+}
+
+// ── FUND PROJECT ──────────────────────────────
+async function doFund() {
+  if (!contract) { notify('Connect wallet first!','err'); return; }
+  const id  = document.getElementById('fp-id').value;
+  const amt = document.getElementById('fp-amt').value;
+  if (!id)  { notify('Enter a Project ID!','err'); return; }
+  if (!amt||Number(amt)<=0) { notify('Enter a valid ETH amount!','err'); return; }
+
+  const btn = document.getElementById('btn-fund');
+  btn.disabled=true; btn.innerHTML='<span class="sp"></span> Sending ETH...';
+  try {
+    const ethers = await loadEthers();
+    const tx = await contract.fundProject(Number(id), {value: ethers.parseEther(amt)});
+    notify('Transaction sent — confirming...','inf');
+    await tx.wait();
+    notify('✅ Project funded!','ok2');
+    document.getElementById('fp-id').value='';
+    document.getElementById('fp-amt').value='';
+    await loadDashboard();
+  } catch(e) { notify('Error: '+(e.reason||e.message),'err'); }
+  finally { btn.disabled=false; btn.innerHTML='💰 Fund Project'; }
+}
+
+// ── UPDATE PROGRESS ───────────────────────────
+async function doUpdate() {
+  if (!contract) { notify('Connect wallet first!','err'); return; }
+  const id   = document.getElementById('up-id').value;
+  const pct  = document.getElementById('up-pct').value;
+  const note = document.getElementById('up-note').value.trim();
+  if (!id)   { notify('Enter a Project ID!','err'); return; }
+  if (!note) { notify('Enter a progress note!','err'); return; }
+
+  const btn = document.getElementById('btn-update');
+  btn.disabled=true; btn.innerHTML='<span class="sp"></span> Updating...';
+  try {
+    const tx = await contract.updateProgress(Number(id), Number(pct), note);
+    notify('Transaction sent — confirming...','inf');
+    await tx.wait();
+    notify('✅ Progress updated to '+pct+'%!','ok2');
+    document.getElementById('up-id').value='';
+    document.getElementById('up-note').value='';
+    await loadDashboard();
+  } catch(e) { notify('Error: '+(e.reason||e.message),'err'); }
+  finally { btn.disabled=false; btn.innerHTML='📊 Update Progress'; }
+}
+
+// ── GET STATUS ────────────────────────────────
+async function doStatus() {
+  if (!contract) { notify('Connect wallet first!','err'); return; }
+  const id = document.getElementById('gs-id').value;
+  if (!id) { notify('Enter a Project ID!','err'); return; }
+  try {
+    // getStatus returns tuple:
+    // [0]=id [1]=name [2]=location [3]=description [4]=creator
+    // [5]=fundingGoal [6]=fundsRaised [7]=progressPercent [8]=progressNote
+    // [9]=status [10]=createdAt
+    const r   = await contract.getStatus(Number(id));
+    const pct = Number(r[7]);
+    const el  = document.getElementById('sres');
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="sres-row">
+        <span class="sres-title">${r[1]}</span>
+        ${badge(r[9])}
+      </div>
+      <div class="sres-loc">📍 ${r[2]}</div>
+      <div class="sres-desc">${r[3]}</div>
+      <div class="pb"><div class="pf" style="width:${pct}%"></div></div>
+      <div class="pl"><span>${pct}% complete</span><span>${toEth(r[6])} / ${toEth(r[5])} ETH</span></div>
+      <div class="sres-note">📝 ${r[8]}</div>
+      <div class="smeta">
+        <div class="smi"><div class="smil">Funds Raised</div><div class="smiv" style="color:var(--success)">${toEth(r[6])} ETH</div></div>
+        <div class="smi"><div class="smil">Funding Goal</div><div class="smiv">${toEth(r[5])} ETH</div></div>
+        <div class="smi"><div class="smil">Creator</div><div class="smiv">${sa(r[4])}</div></div>
+        <div class="smi"><div class="smil">Project ID</div><div class="smiv">#${r[0]}</div></div>
+      </div>`;
+    notify('Status loaded for Project #'+id,'ok2');
+  } catch(e) { notify('Error: '+(e.reason||e.message),'err'); }
+}
+
+// ── MY CONTRIBUTION ───────────────────────────
+async function doContrib() {
+  if (!contract) { notify('Connect wallet first!','err'); return; }
+  const id = document.getElementById('mc-id').value;
+  if (!id) { notify('Enter a Project ID!','err'); return; }
+  try {
+    const val = await contract.getMyContribution(Number(id));
+    const el  = document.getElementById('mc-res');
+    el.style.display = 'block';
+    el.textContent   = 'Project #'+id+' → Your contribution: '+toEth(val)+' ETH';
+  } catch(e) { notify('Error: '+e.message,'err'); }
+}
+</script>
+</body>
+</html>
